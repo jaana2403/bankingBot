@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+
+        header {
+            background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(3,3,79,1) 35%, rgba(0,212,255,1) 100%);
+            color: white;
+            height: 250px;
+            padding: 4rem 0;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .feature-box {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .feature-box .box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            text-align: center;
+        }
+
+        .feature-box .box h3 {
+            font-size: 22px;
+            color: #007bff;
+        }
+
+        .feature-box .box p {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,1,17,1) 35%, rgba(0,212,255,1) 100%);
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .cta-button:hover {
+            background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,1,17,1) 35%, rgba(0,212,255,1) 100%);
+        }
+
+        /* Style for the chatbot UI */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            max-width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-header {
+            background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,1,17,1) 35%, rgba(0,212,255,1) 100%);
+            color: #fff;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .chatbot-header:hover {
+           background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,1,17,1) 35%, rgba(0,212,255,1) 100%);
+        }
+
+        .chatbox {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            max-height: 80vh;
+        }
+
+        .messages {
+    flex-grow: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px;
+    background-color: #f9f9f9;
+    max-height: 300px; /* Set a maximum height to restrict overflow */
+    scrollbar-width: thin; /* For modern browsers, thin scrollbar */
+    scrollbar-color: #007bff #f9f9f9; /* Set scrollbar colors */
+}
+    
+/* WebKit Browsers (Chrome, Safari) */
+.messages::-webkit-scrollbar {
+    width: 8px; /* Set scrollbar width */
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Thumb color */
+    border-radius: 10px; /* Rounded scrollbar */
+}
+
+.messages::-webkit-scrollbar-track {
+    background-color: #f9f9f9; /* Track color */
+}
+
+
+        .message {
+            margin: 5px 0;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+
+        .input-area input {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .input-area button {
+            width: 15%;
+            padding: 8px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+
+        /* The "open chat" button */
+        .open-chat-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        .open-chat-btn:hover {
+            background-color: #0056b3;
+        }
+        
+.feature-container{
+    background-color: var(--light-gray);
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+.feature-content{
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.main-info{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.main-title{
+    font-size: 2.2rem;
+    font-weight: bold;
+}
+
+.main-description{
+    color: var(--gray);
+    font-size: 1rem;
+}
+
+.feature-grid{
+    display: grid;
+   
+    grid-template-columns: repeat(2,1fr);
+    grid-gap: 2rem;
+    margin-top: 1.3rem;
+}
+
+.feature-card{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #6d7890;
+    padding: 1.6rem;
+    border-radius: 1rem;
+    gap: 1rem;
+}
+.feature-info{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.icon-container{
+    background-color: var(--background-color);
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+}
+
+.feature-svg{
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.feature-title{
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.feature-description{
+    color: white;
+}
+
+.feature-card:nth-child(1){
+    background-color: #4a90e2;
+}
+
+.feature-card:nth-child(2){
+    background-color: #FF6289;
+}
+
+.feature-card:nth-child(3){
+    background-color: #fcbf58;
+}
+
+.feature-card:nth-child(4){
+    background-color: #44bfc3;
+}
+
+.feature-card:nth-child(5){
+    background-color: #77b05d;
+}
+
+.feature-card:nth-child(6){
+    background-color: #7d78b1;
+}
+.footer-copyright{
+    color: var(--gray);
+    font-size: 0.75rem;
+    padding-bottom: 2rem;
+    margin-top: 2rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">BankBot</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">About us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Our services</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" aria-disabled="true">FAQ</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      
+    <header>
+        <h1>Welcome to NxtGen Bank</h1>
+        <p>Secure, Reliable, and Convenient Banking Services</p>
+    </header>
+    <div class="container">
+        <div class="section">
+            <h2>About Us</h2>
+            <p>At NxtGen Bank, we are committed to providing a comprehensive suite of banking services designed to help you manage and grow your finances with ease. Whether you're looking to open a savings account, apply for a loan, or invest in your future, our range of personalized services is tailored to meet your unique financial goals.
+
+                We pride ourselves on offering secure, innovative solutions to help you navigate your financial journey, backed by a team of dedicated experts who are always here to support you. From convenient digital banking tools to friendly customer service, we ensure that every interaction is simple, efficient, and designed to empower you with the knowledge and resources you need to succeed financially.
+                
+                Whether you're a new customer or a long-time client, we are here to help you with all your banking needs, making it easier for you to focus on what matters most—your financial well-being.</p>
+        </div>
+    </div>
+    <!-- Main Content Section -->
+    <div class="feature-container">
+        <div class="feature-content">
+            <div class="main-info">
+                <h2 class="main-title">
+                    Our competitive advantage
+                </h2>
+                <p class="main-description">
+                    Our competitive advantage lies in our commitment to providing innovative financial solutions and exceptional customer service.</p>
+            </div>
+            
+            <div class="feature-grid">
+                <!-- card 1 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Personal Banking Solutions
+                        </div>
+                        <div class="feature-description">
+                            Discover a range of tailored banking services, from savings accounts to personal loans, designed to fit your unique financial needs.</div>
+                    </div>
+                </div>
+                <!-- card 2 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Digital Wallet & Payments
+                        </div>
+                        <div class="feature-description">
+                            Experience the future of payments with our secure digital wallet, offering fast, contactless transactions for everyday purchases.</div>
+                    </div>
+                </div>
+                <!-- card 3 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Financial Education & Resources
+                        </div>
+                        <div class="feature-description">
+                            Empower yourself with our educational tools and resources, including budgeting tips, financial planning guides, and investment advice.</div>
+                    </div>
+                </div>
+                <!-- card 4 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Innovative Technology
+                        </div>
+                        <div class="feature-description">
+                            Leverage cutting-edge technologies like augmented reality (AR) and virtual reality (VR) to create immersive banking experiences, helping customers better understand financial products and services through interactive simulations</div>
+                    </div>
+                </div>
+                <!-- card 5 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Responsive Support
+                        </div>
+                        <div class="feature-description">
+                            Provide exceptional customer support and assistance to students and educators.
+                        </div>
+                    </div>
+                </div>
+                <!-- card 6 -->
+                <div class="feature-card">
+                    <div class="feature-info">
+                        <div class="feature-title">
+                            Analytics and Insights
+                        </div>
+                        <div class="feature-description">
+                            Offer detailed progress tracking and analytics to help customer monitor performance and make data-driven decisions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Footer Section -->
+        <footer style="background-color: #1d1111; color: white; padding: 20px; text-align: center;">
+            <h2>Frequently Asked Questions (FAQ)</h2>
+            <div>
+                <h3>How does the bank's chatbot work?</h3>
+                <p>The chatbot is designed to assist you with a variety of banking queries, including account management, loan information, and more. Simply type your question, and the bot will provide instant answers or guide you through specific banking services.</p>
+            </div>
+            <div>
+                <h3>Can I speak to a human agent?</h3>
+                <p>Yes! If you prefer to speak with a human representative, the chatbot can escalate your query to a live agent who will assist you further.</p>
+            </div>
+            <div>
+                <h3>What information do I need to use the chatbot?</h3>
+                <p>You may need to provide your account number or other details, depending on the nature of your inquiry. The chatbot will prompt you for the necessary information to assist you effectively.</p>
+            </div>
+            <div>
+                <h3>Is my data secure with the chatbot?</h3>
+                <p>Absolutely! We take privacy and security seriously. All communications with the chatbot are encrypted, and your personal information is never shared without your consent.</p>
+            </div>
+            <div class="footer-copyright">
+                © 2021 - Present NxtGen Bank. All rights reserved.
+            </div>
+        </footer>
+    
+
+
+    <!-- Open Chat Button -->
+    <div class="open-chat-btn" onclick="toggleChat()">💬</div>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbot-container">
+        <div class="chatbot-header" onclick="toggleChat()">Bank Chatbot</div>
+        <div class="chatbox">
+            <!-- Account Number Section -->
+            <div id="account-section">
+                <label for="account-number">Please enter your account number:</label>
+                <input type="text" id="account-number" placeholder="Account Number">
+                <button onclick="setAccountNumber()">Find Account Number</button>
+            </div>
+
+            <!-- Chat Section -->
+            <div id="chat-section" style="display:none;">
+                <div class="messages" id="messages"></div>
+                <div class="input-area">
+                    <input type="text" id="user-message" placeholder="Type your message">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let accountNumber = '';
+
+        // Toggle chat visibility
+        function toggleChat() {
+            const chatbotContainer = document.getElementById('chatbot-container');
+            if (chatbotContainer.style.display === 'none' || chatbotContainer.style.display === '') {
+                chatbotContainer.style.display = 'block';
+            } else {
+                chatbotContainer.style.display = 'none';
+            }
+        }
+
+        // Set account number function
+        function setAccountNumber() {
+            accountNumber = document.getElementById('account-number').value;
+            if (accountNumber) {
+                fetch('/set_account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ account_number: accountNumber })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('account-section').style.display = 'none';
+                    document.getElementById('chat-section').style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert("Please enter a valid account number.");
+            }
+        }
+
+        // Send user message to the chatbot
+        function sendMessage() {
+            const userMessage = document.getElementById('user-message').value;
+            if (userMessage) {
+                const messageContainer = document.getElementById('messages');
+                const userMessageElement = document.createElement('div');
+                userMessageElement.classList.add('message');
+                userMessageElement.textContent = `You: ${userMessage}`;
+                messageContainer.appendChild(userMessageElement);
+
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userMessage })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const botMessageElement = document.createElement('div');
+                    botMessageElement.classList.add('message');
+                    botMessageElement.textContent = `Bot: ${data.response}`;
+                    messageContainer.appendChild(botMessageElement);
+                    document.getElementById('user-message').value = ''; // Clear input field
+                    messageContainer.scrollTop = messageContainer.scrollHeight; // Scroll to the bottom
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+ 
+</body>
+</html>
